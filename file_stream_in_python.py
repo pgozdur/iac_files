@@ -24,3 +24,21 @@ with open("ip_addresses.txt", "w") as file:
 # Create and write to "routing_table.txt"
 with open("routing_table.txt", "w") as file:
     file.write(routing_table_content)
+
+# Let's create the "ip_list.txt" file with a list of IP addresses, including some duplicates for the exercise.
+
+# Content for "ip_list.txt"
+ip_list_content = """192.168.1.10
+10.1.1.1
+192.168.1.20
+172.16.0.2
+192.168.1.10  # Duplicate
+10.1.1.2
+172.16.0.3
+10.1.1.1  # Duplicate"""
+
+# Create and write to "ip_list.txt"
+with open("ip_list.txt", "w") as file:
+    file.write(ip_list_content)
+
+"ip_list.txt"  # Return the path to the created file
