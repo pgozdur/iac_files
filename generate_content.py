@@ -76,6 +76,9 @@ def create_prefix_tags(tag):
         return tag
     
 def assign_ip_to_interface(interface, ip):
+    if api.ipam.ip_address_to_interface.get(ip_address=ip['id']):
+        print(f"IP address with ID {ip['id']} already assigned to interface")
+    else:
         print(f"Assigning IP address to interface")
         ip = api.ipam.ip_address_to_interface.create(
             ip_address=ip,
@@ -84,7 +87,23 @@ def assign_ip_to_interface(interface, ip):
         )
         return ip
 
+def assign_primary_ip_to_device(device, ip):
+    if device.primary_ip4:
+        print(f"Device {device.name} already has a primary IP address")
+    else:
+        print(f"Assigning IP address to device")
+        print(device.id)
+        print(ip['id'])
+        ip = api.dcim.devices.update(
+            id = device.id,
+            data = {"primary_ip4": ip['id']}
+        )
+        return ip
+
+
 # Main script
+
+print("Creating datacenter fabric devices")
 
 nautobot_locations = api.dcim.locations.all()
 
@@ -137,5 +156,8 @@ for location in nautobot_locations:
             "object_type": "ipam.ipaddress",
             }
         assign_ip_to_interface(interface_dict, ip_dict)
+        assign_primary_ip_to_device(device, ip_dict)
+    
 
-print("Datacenter created successfully")
+
+print("Datacenter fabric devices created successfully")
