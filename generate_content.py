@@ -125,7 +125,6 @@ for location in nautobot_locations:
     ip_address_id_list = [ip.id for ip in ip_address_id_object_list]
 
     for device in devices:
-        print(device.name)
         interface_id = api.dcim.interfaces.filter(device=device.name, name="fxp0",location=location.id)[0].id
         ip_id = ip_address_id_list[0]
         ip_address_id_list.pop(0)
@@ -138,7 +137,5 @@ for location in nautobot_locations:
             "object_type": "ipam.ipaddress",
             }
         assign_ip_to_interface(interface_dict, ip_dict)
-        print(interface_id)
-
 
 print("Datacenter created successfully")
