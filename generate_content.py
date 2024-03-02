@@ -110,6 +110,8 @@ for location in nautobot_locations:
     # Adding tags based on location name
     tag = location.name
     create_prefix_tags(tag)
+
+for location in nautobot_locations:
     
     # Creatig devices for each rack
     racks = api.dcim.racks.filter(location=location.id)
