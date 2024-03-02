@@ -92,8 +92,6 @@ def assign_primary_ip_to_device(device, ip):
         print(f"Device {device.name} already has a primary IP address")
     else:
         print(f"Assigning IP address to device")
-        print(device.id)
-        print(ip['id'])
         ip = api.dcim.devices.update(
             id = device.id,
             data = {"primary_ip4": ip['id']}
