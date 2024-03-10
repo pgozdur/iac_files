@@ -20,4 +20,4 @@ vrf_data = {
 customer_1_vrf = nautobot.ipam.vrfs.create(**vrf_data)
 
 # Associate the VRF with Spine devices in London
-print("VRF 'Customer_1' created and associated with Spine devices in London.")
+print("VRF 'Customer_1' created.")
