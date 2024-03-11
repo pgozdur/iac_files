@@ -1,0 +1,71 @@
+---
+- name: Dynamically Create VLAN and Assign to Interfaces on Spine Devices
+  hosts: device_roles_routers  # Targets all router devices
+  gather_facts: no
+  vars:
+    api_endpoint: "http://35.158.228.245:8080"
+    token: "hgTf5GBfrsabcdef0123456789abcdTTg511Sdq"
+    validate_certs: no
+  vars_prompt:
+    - name: vlan_id
+      prompt: "Enter VLAN ID"
+      private: no
+    - name: vlan_name
+      prompt: "Enter VLAN Name"
+      private: no
+
+  tasks:
+    - name: Create vlan within Nautobot
+      networktocode.nautobot.vlan:
+        url: "{{ api_endpoint }}"
+        token: "{{ token }}"
+        name: "{{ vlan_name }}"
+        vid: "{{ vlan_id | int }}"
+        location:
+          name: "{{ location }}"
+        status: Active
+        state: present
+      delegate_to: localhost
+      run_once: true
+
+    - name: Extract Interface Metadata and Set as Variables
+      set_fact:
+        interface_metadata: "{{ hostvars[inventory_hostname]['interfaces'] | default([]) }}"
+
+
+    - name: Filter Interfaces with 'cloud_interface' Tag
+      set_fact:
+        cloud_interfaces: "{{ cloud_interfaces | default([]) + [item] }}"
+      loop: "{{ interface_metadata }}"
+      loop_control:
+        label: '{{ item.name }}'
+      when: 
+        - item.tags is defined
+        - item.tags | selectattr('name', 'equalto', 'cloud_interface') | list | count > 0
+
+    - name: Debug variable location
+      debug:
+        msg: "{{ location }}"
+      delegate_to: localhost
+
+    - name: Create Sub-interface and Assign VLAN
+      networktocode.nautobot.device_interface:
+        url: "{{ api_endpoint }}"
+        token: "{{ token }}"
+        validate_certs: "{{ validate_certs }}"
+        device: 
+          name: "{{ inventory_hostname }}"
+          location: "{{ location }}"
+        name: "{{ item.name }}.{{ vlan_id }}"  # Construct sub-interface name by appending VLAN ID to the parent interface name
+        type: "virtual"  # Assuming 'virtual' type for sub-interfaces, adjust as needed based on your Nautobot data model
+        enabled: true  # Enable the interface
+        tagged_vlans:
+          - name: "{{ vlan_name }}"
+            vid: "{{ vlan_id | int }}"
+        status: Active
+        mode: tagged
+        parent_interface:
+          name: "{{ item.name }}"
+          device__name: "{{ inventory_hostname }}"
+      loop: "{{ cloud_interfaces }}"
+      delegate_to: localhost
