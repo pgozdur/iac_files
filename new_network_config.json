@@ -1,0 +1,13 @@
+{
+    "switch": "Switch1",
+    "ports": [
+        {
+            "name": "FastEthernet0/1",
+            "vlan": "10"
+        },
+        {
+            "name": "FastEthernet0/2",
+            "vlan": "20"
+        }
+    ]
+}
